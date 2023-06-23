@@ -208,7 +208,6 @@ func main() {
 				fmt.Println("messageType is not TextMessage", messageType)
 				break
 			}
-			fmt.Println("Received request to log")
 			for {
 				select {
 				case l := <-webLogChan:

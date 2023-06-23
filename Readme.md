@@ -28,7 +28,7 @@ sentri cat Readme.md
 #sentri go run auth/main.go
 #sentri go run cache/main.go
 ```
-![](out.png)
+
 #### or, use as logrus hook
 ```go
 package main
@@ -36,9 +36,16 @@ package main
 import "github.com/Ishan27g/sentri/hook"
 
 func main(){
-	
-    w := hook.Hook("cmdName", os.Stdout)
-    logrus.SetOutput(w)
-	
+
+	w := hook.Hook("cmdName", os.Stdout)
+	logrus.SetOutput(w)
+
 }
 ```
+
+#### example shell output
+![shell](shell.png)
+
+#### example ui output
+![ui](ui/ui.png)
+
