@@ -3,6 +3,7 @@ module github.com/Ishan27g/sentri
 go 1.20
 
 require (
+	github.com/DavidGamba/dgtools/run v0.7.0
 	github.com/alitto/pond v1.8.3
 	github.com/fatih/color v1.15.0
 	github.com/gorilla/mux v1.8.0

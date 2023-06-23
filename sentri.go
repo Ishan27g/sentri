@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/DavidGamba/dgtools/run"
+	"github.com/Ishan27g/sentri/hook"
 	"github.com/Ishan27g/sentri/internal"
 	"github.com/fatih/color"
 	"github.com/gorilla/mux"
@@ -120,6 +122,14 @@ func upgrade(writer http.ResponseWriter, request *http.Request) (*websocket.Conn
 }
 
 func main() {
+
+	if len(os.Args) >= 2 {
+		hook.Cmd(os.Args[1], os.Stdout, run.CMD(os.Args[1:]...))
+		// wait for publish
+		<-time.After(1 * time.Second)
+		return
+	}
+
 	appShell = make(map[app]*color.Attribute)
 	appHtml = make(map[app]*string)
 
@@ -132,15 +142,13 @@ func main() {
 		for {
 			<-time.After(3 * time.Second)
 			if lastCount != s.count {
-				fmt.Println(fmt.Sprintf("%d NEW LOGS, %d TOTAL LOGS", s.count-lastCount, s.count))
+				//fmt.Println(fmt.Sprintf("%d NEW LOGS, %d TOTAL LOGS", s.count-lastCount, s.count))
 				lastCount = s.count
 			}
 		}
-
 	}()
 	go writeFromNats()
 	go func() {
-
 		for o := range s.outputCh {
 			if toStdOut {
 				shClr := getOrNextShColor(o.From)

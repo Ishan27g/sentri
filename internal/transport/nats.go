@@ -2,7 +2,6 @@ package transport
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sync"
 	"time"
@@ -30,13 +29,13 @@ func setupConnOptions(opts []nats.Option) []nats.Option {
 	opts = append(opts, nats.ReconnectWait(reconnectDelay))
 	opts = append(opts, nats.MaxReconnects(int(totalWait/reconnectDelay)))
 	opts = append(opts, nats.DisconnectErrHandler(func(nc *nats.Conn, err error) {
-		log.Printf("Disconnected due to:%s, will attempt reconnects for %.0fm", err, totalWait.Minutes())
+		fmt.Printf("Disconnected due to:%s, will attempt reconnects for %.0fm", err, totalWait.Minutes())
 	}))
 	opts = append(opts, nats.ReconnectHandler(func(nc *nats.Conn) {
-		log.Printf("Reconnected [%s]", nc.ConnectedUrl())
+		fmt.Printf("Reconnected [%s]", nc.ConnectedUrl())
 	}))
 	opts = append(opts, nats.ClosedHandler(func(nc *nats.Conn) {
-		log.Fatalf("Exiting: %v", nc.LastError())
+		fmt.Printf("Exiting: %v", nc.LastError())
 	}))
 	return opts
 }
@@ -44,7 +43,6 @@ func init() {
 
 	subjects = make(map[string]*subjectMeta)
 	lock = sync.RWMutex{}
-	log.SetFlags(log.LstdFlags)
 	opts := []nats.Option{nats.Name("-nats-")}
 	opts = setupConnOptions(opts)
 
@@ -52,7 +50,7 @@ func init() {
 func connect() {
 	natsC, err := nats.Connect(urls, opts...)
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		return
 	}
 	nc = natsC
@@ -63,9 +61,9 @@ func sub(subj string, cb func(msg *nats.Msg)) {
 	})
 	nc.Flush()
 	if err := nc.LastError(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
-	log.Printf("Listening on [%s]", subj)
+	fmt.Println("nats-sub for", subj)
 
 }
 
@@ -104,9 +102,9 @@ func NatsPublish(subj string, msg []byte) bool {
 	}
 
 	if err = nc.LastError(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	} else {
-		//log.Printf("Published [%s] : '%s'\n", subj, msg)
+		//fmt.Printf("Published [%s] : '%s'\n", subj, msg)
 	}
 	return true
 }
