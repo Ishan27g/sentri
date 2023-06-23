@@ -136,7 +136,6 @@ func main() {
 	s = &sentri{}
 	s.outputCh = make(chan internal.Output)
 	s.p = internal.GetPool()
-
 	go func() {
 		lastCount := 0
 		for {
@@ -150,28 +149,30 @@ func main() {
 	go writeFromNats()
 	go func() {
 		for o := range s.outputCh {
-			if toStdOut {
-				shClr := getOrNextShColor(o.From)
-				c := color.New(*shClr, color.Bold)
-				if timestamp {
-					fmt.Println(c.Sprintf(o.From), o.Timestamp.Format(time.RFC3339), o.Log)
-				} else {
-					fmt.Println(c.Sprintf(o.From), o.Log)
+			s.p.Submit(func() {
+				if toStdOut {
+					shClr := getOrNextShColor(o.From)
+					c := color.New(*shClr, color.Bold)
+					if timestamp {
+						fmt.Println(c.Sprintf(o.From), o.Timestamp.Format(time.RFC3339), o.Log)
+					} else {
+						fmt.Println(c.Sprintf(o.From), o.Log)
+					}
 				}
-			}
-			if toWebSock {
-				htmlClr := getOrNextHtml(o.From)
-				u := UiLog{
-					From:  o.From,
-					Color: htmlClr,
+				if toWebSock {
+					htmlClr := getOrNextHtml(o.From)
+					u := UiLog{
+						From:  o.From,
+						Color: htmlClr,
+					}
+					if timestamp {
+						u.Text = o.Timestamp.Format(time.RFC3339) + " " + o.Log
+					} else {
+						u.Text = o.Log
+					}
+					webLogChan <- u
 				}
-				if timestamp {
-					u.Text = o.Timestamp.Format(time.RFC3339) + " " + o.Log
-				} else {
-					u.Text = o.Log
-				}
-				webLogChan <- u
-			}
+			})
 		}
 		close(s.outputCh)
 	}()
