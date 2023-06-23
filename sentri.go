@@ -54,23 +54,23 @@ type sentri struct {
 }
 
 func getOrNextHtml(from string) string {
-	cIndexHt = cIndexHt + 1
 	if appHtml[app(from)] != nil {
 		return *appHtml[app(from)]
 	}
-	if cIndexHt >= len(colorsHtml) {
+	if cIndexHt == len(colorsHtml) {
 		cIndexHt = 0
 	}
+	cIndexHt = cIndexHt + 1
 	appHtml[app(from)] = &colorsHtml[cIndexHt]
 	return *appHtml[app(from)]
 }
 
 func getOrNextShColor(from string) *color.Attribute {
-	cIndexSh = cIndexSh + 1
 	if appShell[app(from)] != nil {
 		return appShell[app(from)]
 	}
-	if cIndexSh >= len(colorsShell) {
+	cIndexSh = cIndexSh + 1
+	if cIndexSh == len(colorsShell) {
 		cIndexSh = 0
 	}
 	appShell[app(from)] = &colorsShell[cIndexSh]
@@ -126,7 +126,7 @@ func main() {
 	if len(os.Args) >= 2 {
 		hook.Cmd(os.Args[1], os.Stdout, run.CMD(os.Args[1:]...))
 		// wait for publish
-		<-time.After(1 * time.Second)
+		<-time.After(2 * time.Second)
 		return
 	}
 

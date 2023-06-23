@@ -48,12 +48,19 @@ func init() {
 
 }
 func connect() {
-	natsC, err := nats.Connect(urls, opts...)
-	if err != nil {
-		fmt.Println(err)
+	if nc != nil {
 		return
 	}
-	nc = natsC
+	for {
+		<-time.After(1 * time.Second)
+		natsC, err := nats.Connect(urls, opts...)
+		if err != nil {
+			//fmt.Println(err)
+		} else {
+			nc = natsC
+			break
+		}
+	}
 }
 func sub(subj string, cb func(msg *nats.Msg)) {
 	nc.Subscribe(subj, func(msg *nats.Msg) {
